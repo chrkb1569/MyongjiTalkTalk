@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.demo.controller.user;
 
 import com.example.demo.dto.security.TokenRequestDto;
 import com.example.demo.dto.security.UserSignInRequestDto;
@@ -24,13 +24,13 @@ public class UserController {
         userService.singUp(requestDto);
     }
 
-    @GetMapping("/sign-in")
+    @PostMapping("/sign-in")
     @ResponseStatus(HttpStatus.OK)
     public Response signIn(@RequestBody @Valid UserSignInRequestDto requestDto) {
         return Response.success(userService.signIn(requestDto));
     }
 
-    @GetMapping("/reissue")
+    @PostMapping("/reissue")
     @ResponseStatus(HttpStatus.OK)
     public Response reIssue(@RequestBody @Valid TokenRequestDto requestDto) {
         return Response.success(userService.reIssue(requestDto));

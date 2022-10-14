@@ -8,7 +8,7 @@ import com.example.demo.dto.security.UserSignUpRequestDto;
 import com.example.demo.dto.token.RefreshTokenDto;
 import com.example.demo.entity.user.Authority;
 import com.example.demo.entity.user.User;
-import com.example.demo.exeption.user.DuplicateEmailException;
+import com.example.demo.exeption.user.DuplicateStudentIdException;
 import com.example.demo.exeption.user.DuplicateUsernameException;
 import com.example.demo.exeption.user.LoginFailureException;
 import com.example.demo.repository.UserRepository;
@@ -40,14 +40,15 @@ public class UserService {
     @Transactional // 회원 가입 로직
     public void singUp(UserSignUpRequestDto requestDto) {
 
-        userDuplicationCheck(requestDto.getUsername(), requestDto.getEmail());
+        userDuplicationCheck(requestDto.getUsername(), requestDto.getStudentId());
 
         User user = User.builder()
                 .name(requestDto.getName())
                 .username(requestDto.getUsername())
                 .password(passwordEncoder.encode(requestDto.getPassword()))
-                .email(requestDto.getEmail())
+                .subject(requestDto.getSubject())
                 .authority(Authority.ROLE_USER)
+                .studentId(requestDto.getStudentId())
                 .build();
 
         userRepository.save(user);
@@ -87,12 +88,12 @@ public class UserService {
     }
 
     // 사용자가 회원 가입을 요청할경우, 이미 가입되어 있는 정보를 입력한 것이 아닌지 확인하는 로직
-    public void userDuplicationCheck(String username, String email) {
+    public void userDuplicationCheck(String username, String studentId) {
         if(userRepository.existsUserByUsername(username)) {
             throw new DuplicateUsernameException(username);
         }
-        if(userRepository.existsUserByEmail(email)) {
-            throw new DuplicateEmailException(email);
+        if(userRepository.existsUserByStudentId(studentId)) {
+            throw new DuplicateStudentIdException(studentId);
         }
     }
 }

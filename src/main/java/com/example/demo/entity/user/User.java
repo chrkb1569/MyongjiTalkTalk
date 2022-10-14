@@ -28,8 +28,11 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String name; // 사용자 이름
 
+    @Column(nullable = false)
+    private String subject; // 사용자 학과
+
     @Column(nullable = false, unique = true)
-    private String email; // 사용자 이메일
+    private String studentId; // 사용자 학번
 
     @Enumerated(EnumType.STRING)
     private Authority authority; // 사용자 권한
