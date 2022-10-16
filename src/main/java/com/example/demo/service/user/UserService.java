@@ -1,16 +1,15 @@
 package com.example.demo.service.user;
 
 import com.example.demo.config.jwt.TokenProvider;
-import com.example.demo.dto.security.TokenRequestDto;
-import com.example.demo.dto.security.UserSignInRequestDto;
-import com.example.demo.dto.security.TokenResponseDto;
-import com.example.demo.dto.security.UserSignUpRequestDto;
+import com.example.demo.dto.security.*;
 import com.example.demo.dto.token.RefreshTokenDto;
+import com.example.demo.dto.user.*;
 import com.example.demo.entity.user.Authority;
 import com.example.demo.entity.user.User;
 import com.example.demo.exeption.user.DuplicateStudentIdException;
 import com.example.demo.exeption.user.DuplicateUsernameException;
 import com.example.demo.exeption.user.LoginFailureException;
+import com.example.demo.exeption.user.UserNotFoundException;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.redis.RedisService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,6 +86,45 @@ public class UserService {
 
         return new TokenResponseDto(refreshTokenDto.getOriginToken(), refreshTokenDto.getRefreshToken());
     }
+
+    @Transactional // 비밀번호 변경 로직
+    public void changePassword(UserPasswordChangeRequestDto requestDto) {
+        String loginUser = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        User findUser = userRepository.findUserByUsername(loginUser)
+                .orElseThrow(UserNotFoundException::new);
+
+        findUser.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+    }
+
+    @Transactional // 아이디 찾기 로직
+    public String searchId(UserIdRequestDto requestDto) {
+
+        User findUser = userRepository.findUserByStudentId(requestDto.getStudentId())
+                .orElseThrow(UserNotFoundException::new);
+
+        if(!findUser.getName().equals(requestDto.getName()) || !findUser.getSubject().equals(requestDto.getSubject())) {
+            throw new UserNotFoundException();
+        }
+
+        return findUser.getUsername();
+    }
+
+    @Transactional // 비밀번호 재발급 로직
+    public String reIssuePassword(UserPasswordReissueRequestDto requestDto) {
+        User findUser = userRepository.
+                findUserByUsernameAndStudentId(requestDto.getUsername(), requestDto.getStudentId())
+                .orElseThrow(UserNotFoundException::new);
+
+        String originPassword = findUser.getPassword();
+
+        String reIssuePassword = originPassword.replaceAll("\\D", "");
+
+        findUser.setPassword(passwordEncoder.encode(reIssuePassword));
+
+        return reIssuePassword;
+    }
+
 
     // 사용자가 회원 가입을 요청할경우, 이미 가입되어 있는 정보를 입력한 것이 아닌지 확인하는 로직
     public void userDuplicationCheck(String username, String studentId) {
