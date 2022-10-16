@@ -7,6 +7,7 @@ import com.example.demo.exeption.jwt.WrongRefreshTokenException;
 import com.example.demo.exeption.user.DuplicateStudentIdException;
 import com.example.demo.exeption.user.DuplicateUsernameException;
 import com.example.demo.exeption.user.LoginFailureException;
+import com.example.demo.exeption.user.UserNotFoundException;
 import com.example.demo.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -66,5 +67,11 @@ public class ExceptionAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Response writerNotMatchException() {
         return Response.failure(400, "현재 로그인한 사용자와 작성자의 정보가 일치하지 않습니다.");
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response userNotFoundException() {
+        return Response.failure(404, "해당 정보를 가지고 있는 사용자를 찾지 못하였습니다.");
     }
 }
