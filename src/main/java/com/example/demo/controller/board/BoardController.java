@@ -37,7 +37,7 @@ public class BoardController {
 
     @PutMapping("/boards/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void edit(@PathVariable long id, BoardEditRequestDto requestDto) {
+    public void edit(@PathVariable long id, @RequestBody @Valid BoardEditRequestDto requestDto) {
         boardService.edit(id, requestDto);
     }
 
