@@ -3,6 +3,9 @@ package com.example.demo.advice;
 import com.example.demo.exeption.board.BoardNotFoundException;
 import com.example.demo.exeption.board.ListEmptyException;
 import com.example.demo.exeption.board.WriterNotMatchException;
+import com.example.demo.exeption.bus.EmptyBusStationException;
+import com.example.demo.exeption.bus.StationNotFoundException;
+import com.example.demo.exeption.bus.WrongBusInfoException;
 import com.example.demo.exeption.jwt.WrongRefreshTokenException;
 import com.example.demo.exeption.user.DuplicateStudentIdException;
 import com.example.demo.exeption.user.DuplicateUsernameException;
@@ -73,5 +76,23 @@ public class ExceptionAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Response userNotFoundException() {
         return Response.failure(404, "해당 정보를 가지고 있는 사용자를 찾지 못하였습니다.");
+    }
+
+    @ExceptionHandler(StationNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response stationNotFoundException(StationNotFoundException e) {
+        return Response.failure(404, e.getMessage() + "는 존재하지 않는 정류장입니다. 다시 한번 확인해주세요.");
+    }
+
+    @ExceptionHandler(WrongBusInfoException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Response wrongBusInfoException() {
+        return Response.failure(400, "버스 정보를 다시 한번 확인해주세요.");
+    }
+
+    @ExceptionHandler(EmptyBusStationException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response emptyBusStationException() {
+        return Response.failure(400, "현재 도착 예정인 버스가 존재하지 않습니다.");
     }
 }
