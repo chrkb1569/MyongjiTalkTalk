@@ -10,7 +10,7 @@ import com.example.demo.exeption.user.DuplicateStudentIdException;
 import com.example.demo.exeption.user.DuplicateUsernameException;
 import com.example.demo.exeption.user.LoginFailureException;
 import com.example.demo.exeption.user.UserNotFoundException;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.user.UserRepository;
 import com.example.demo.service.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
