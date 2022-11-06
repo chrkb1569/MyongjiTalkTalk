@@ -6,6 +6,10 @@ import com.example.demo.exeption.board.WriterNotMatchException;
 import com.example.demo.exeption.bus.EmptyBusStationException;
 import com.example.demo.exeption.bus.StationNotFoundException;
 import com.example.demo.exeption.bus.WrongBusInfoException;
+import com.example.demo.exeption.category.CategoryDuplicateException;
+import com.example.demo.exeption.category.CategoryListEmptyException;
+import com.example.demo.exeption.category.CategoryNotFoundException;
+import com.example.demo.exeption.comment.CommentNotFoundException;
 import com.example.demo.exeption.jwt.WrongRefreshTokenException;
 import com.example.demo.exeption.user.DuplicateStudentIdException;
 import com.example.demo.exeption.user.DuplicateUsernameException;
@@ -93,6 +97,30 @@ public class ExceptionAdvice {
     @ExceptionHandler(EmptyBusStationException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Response emptyBusStationException() {
-        return Response.failure(400, "현재 도착 예정인 버스가 존재하지 않습니다.");
+        return Response.failure(404, "현재 도착 예정인 버스가 존재하지 않습니다.");
+    }
+
+    @ExceptionHandler(CategoryListEmptyException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response categoryListEmptyException() {
+        return Response.failure(404, "카테고리가 존재하지 않습니다.");
+    }
+
+    @ExceptionHandler(CategoryDuplicateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Response categoryDuplicateException() {
+        return Response.failure(409, "이미 존재하는 카테고리입니다.");
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response categoryNotFoundException() {
+        return Response.failure(404, "해당 Id에 해당하는 카테고리를 찾지 못하였습니다.");
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response commentNotFoundException() {
+        return Response.failure(404, "해당 Id에 해당하는 댓글을 찾지 못하였습니다.");
     }
 }
