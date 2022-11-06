@@ -17,33 +17,33 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @GetMapping("/boards")
+    @GetMapping("/boards/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
-    public Response getBoards() {
-        return Response.success(boardService.getBoards());
+    public Response getBoards(@PathVariable Long categoryId) {
+        return Response.success(boardService.getBoards(categoryId));
     }
 
-    @GetMapping("/boards/{id}")
+    @GetMapping("/boards/{categoryId}/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Response getBoard(@PathVariable long id) {
-        return Response.success(boardService.getBoard(id));
+    public Response getBoard(@PathVariable long categoryId, @PathVariable long id) {
+        return Response.success(boardService.getBoard(categoryId, id));
     }
 
-    @PostMapping("/boards")
+    @PostMapping("/boards/{categoryId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@Valid @RequestBody BoardWriteRequestDto requestDto) {
-        boardService.write(requestDto);
+    public void create(@Valid @RequestBody BoardWriteRequestDto requestDto, @PathVariable long categoryId) {
+        boardService.write(requestDto, categoryId);
     }
 
-    @PutMapping("/boards/{id}")
+    @PutMapping("/boards/{categoryId}/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void edit(@PathVariable long id, @RequestBody @Valid BoardEditRequestDto requestDto) {
-        boardService.edit(id, requestDto);
+    public void edit(@PathVariable long categoryId, @PathVariable long id, @RequestBody @Valid BoardEditRequestDto requestDto) {
+        boardService.edit(categoryId, id, requestDto);
     }
 
-    @DeleteMapping("/boards/{id}")
+    @DeleteMapping("/boards/{categoryId}/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable long id) {
-        boardService.delete(id);
+    public void delete(@PathVariable long categoryId, @PathVariable long id) {
+        boardService.delete(categoryId, id);
     }
 }

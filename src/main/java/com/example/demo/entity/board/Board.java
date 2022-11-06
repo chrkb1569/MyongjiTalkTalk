@@ -1,10 +1,13 @@
 package com.example.demo.entity.board;
 
 import com.example.demo.entity.base.BaseEntity;
+import com.example.demo.entity.category.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -27,4 +30,9 @@ public class Board extends BaseEntity {
 
     @Column(name = "writer", nullable = false)
     private String writer;
+
+    @JoinColumn(name = "category_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Category category;
 }
