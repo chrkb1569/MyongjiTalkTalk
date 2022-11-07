@@ -11,6 +11,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsUtils;
+
+import java.util.List;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -31,6 +35,19 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtEntryPointHandler)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
+
+                .and()
+                .cors().configurationSource(request -> {
+                    var cors = new CorsConfiguration();
+                    cors.setAllowedOrigins(List.of("http://localhost:3000"));
+                    cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                    cors.setAllowedHeaders(List.of("*"));
+                    return cors;
+                })
+
+                .and()
+                .authorizeRequests()
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 
                 .and()
                 .logout().disable()
