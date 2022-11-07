@@ -2,10 +2,7 @@ package com.example.demo.entity.board;
 
 import com.example.demo.entity.base.BaseEntity;
 import com.example.demo.entity.category.Category;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -16,6 +13,7 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class Board extends BaseEntity {
 
     @Id

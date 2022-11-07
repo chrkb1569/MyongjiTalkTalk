@@ -2,10 +2,7 @@ package com.example.demo.entity.comment;
 
 import com.example.demo.entity.base.BaseEntity;
 import com.example.demo.entity.board.Board;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -16,6 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
+@EqualsAndHashCode(callSuper = false)
 public class Comment extends BaseEntity {
 
     @Id
