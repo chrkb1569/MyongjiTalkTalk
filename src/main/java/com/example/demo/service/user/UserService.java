@@ -5,11 +5,14 @@ import com.example.demo.dto.security.*;
 import com.example.demo.dto.token.RefreshTokenDto;
 import com.example.demo.dto.user.*;
 import com.example.demo.entity.user.Authority;
+import com.example.demo.entity.user.RefreshToken;
 import com.example.demo.entity.user.User;
+import com.example.demo.exeption.jwt.WrongRefreshTokenException;
 import com.example.demo.exeption.user.DuplicateStudentIdException;
 import com.example.demo.exeption.user.DuplicateUsernameException;
 import com.example.demo.exeption.user.LoginFailureException;
 import com.example.demo.exeption.user.UserNotFoundException;
+import com.example.demo.repository.user.RefreshTokenRepository;
 import com.example.demo.repository.user.UserRepository;
 import com.example.demo.service.redis.RedisService;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +32,13 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final RefreshTokenRepository refreshTokenRepository;
+
     private final BCryptPasswordEncoder passwordEncoder;
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
     private final TokenProvider tokenProvider;
-
-    private final RedisService redisService;
 
     @Transactional // 회원 가입 로직
     public void singUp(UserSignUpRequestDto requestDto) {
@@ -69,7 +72,10 @@ public class UserService {
 
         RefreshTokenDto token = tokenProvider.createToken(authentication);
 
-        redisService.setValues(authentication.getName(), token.getRefreshToken());
+        RefreshToken refreshToken = RefreshToken.builder()
+                .id(authentication.getName()).value(token.getRefreshToken()).build();
+
+        refreshTokenRepository.save(refreshToken);
 
         TokenResponseDto responseDto = new TokenResponseDto(token.getOriginToken(), token.getRefreshToken());
 
@@ -78,13 +84,30 @@ public class UserService {
 
     @Transactional // 토큰 재발급 로직
     public TokenResponseDto reIssue(TokenRequestDto requestDto) {
+
+        if(!tokenProvider.validateToken(requestDto.getRefreshToken())) {
+            throw new WrongRefreshTokenException();
+        }
+
         Authentication authentication = tokenProvider.getAuthentication(requestDto.getOriginToken());
 
-        redisService.validateRefreshToken(authentication.getName(), requestDto.getRefreshToken());
+        RefreshToken findItem = refreshTokenRepository
+                .findById(authentication.getName()).orElseThrow(() -> new RuntimeException("현재 로그인하지 않은 회원입니다."));
 
-        RefreshTokenDto refreshTokenDto = tokenProvider.createToken(authentication);
+        if(!findItem.getValue().equals(requestDto.getRefreshToken())) {
+            throw new RuntimeException("토큰 정보가 일치하지 않습니다.");
+        }
 
-        return new TokenResponseDto(refreshTokenDto.getOriginToken(), refreshTokenDto.getRefreshToken());
+        RefreshTokenDto token = tokenProvider.createToken(authentication);
+
+        RefreshToken refreshToken = RefreshToken.builder()
+                .id(token.getOriginToken())
+                .value(token.getRefreshToken())
+                .build();
+
+        refreshTokenRepository.save(refreshToken);
+
+        return new TokenResponseDto(token.getOriginToken(), token.getRefreshToken());
     }
 
     @Transactional // 비밀번호 변경 로직
