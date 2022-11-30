@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     boolean existsCommentById(long id);
+    boolean existsCommentByBoardId(long id);
     List<Comment> findAllByBoardId(long id);
 }

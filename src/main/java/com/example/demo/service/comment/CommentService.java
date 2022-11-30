@@ -4,11 +4,12 @@ import com.example.demo.dto.comment.CommentCreateRequestDto;
 import com.example.demo.entity.board.Board;
 import com.example.demo.entity.comment.Comment;
 import com.example.demo.exeption.board.BoardNotFoundException;
+import com.example.demo.exeption.board.WriterNotMatchException;
 import com.example.demo.exeption.comment.CommentNotFoundException;
 import com.example.demo.repository.board.BoardRepository;
 import com.example.demo.repository.comment.CommentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,8 +38,12 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(long commentId) {
-        if(!commentRepository.existsCommentById(commentId)) {
-            throw new CommentNotFoundException();
+        Comment findItem = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(!findItem.getWriter().equals(authentication.getName())) {
+            throw new WriterNotMatchException();
         }
 
         commentRepository.deleteById(commentId);

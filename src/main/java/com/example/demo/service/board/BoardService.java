@@ -56,16 +56,14 @@ public class BoardService {
 
         Board findItem = boardRepository.findBoardByCategoryIdAndId(categoryId, id).orElseThrow(BoardNotFoundException::new);
 
-        if(!commentRepository.existsCommentById(id)) {
+        if(!commentRepository.existsCommentByBoardId(id)) {
             return new BoardResponseDto(findItem);
         }
-        else {
-            List<CommentDto> lst = commentRepository.findAllByBoardId(id)
-                    .stream().map(s -> new CommentDto().toDto(s)).collect(Collectors.toList());
 
-            return new BoardResponseDto(findItem, lst);
-        }
+        List<CommentDto> lst = commentRepository.findAllByBoardId(id)
+                .stream().map(s -> new CommentDto().toDto(s)).collect(Collectors.toList());
 
+        return new BoardResponseDto(findItem, lst);
     }
 
     @Transactional
